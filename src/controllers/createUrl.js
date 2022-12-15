@@ -4,26 +4,12 @@ const isUrl = require("is-valid-http-url");
 const axios = require("axios");
 const redis = require("redis");
 
-const { promisify } = require("util");
-
-//1. Connect to the redis server
-const redisClient = redis.createClient(
-  19717,
-  "redis-19717.c264.ap-south-1-1.ec2.cloud.redislabs.com",
-  { no_ready_check: true }
-);
-redisClient.auth("zvyCd8xYcj2rO6N4NCUrbkivoAZiX15K", function (err) {
-  if (err) throw err;
+/*--------------------Connect to the redis server----------------------*/
+const redisClient = redis.createClient({
+    url : "redis://default:zvyCd8xYcj2rO6N4NCUrbkivoAZiX15K@redis-19717.c264.ap-south-1-1.ec2.cloud.redislabs.com:19717"
 });
 
-redisClient.on("connect", async function () {
-  console.log("Connected to Redis..");
-});
-
-//2. Prepare the functions for each command
-
-const SET_ASYNC = promisify(redisClient.SET).bind(redisClient);
-const GET_ASYNC = promisify(redisClient.GET).bind(redisClient);
+redisClient.connect(console.log("Connected to Redis..."))
 
 const createUrl = async function (req, res) {
   try {
@@ -41,13 +27,15 @@ const createUrl = async function (req, res) {
     let checkUrlExistence = await axios.get(longUrl)
     .then(() => longUrl)
     .catch(() => null);
-    if (!checkUrlExistence)
-      return res.status(404).send({ status: false, message: "currently this url is not exist" });
+    if (!checkUrlExistence)return res.status(404).send({ status: false, message: "currently this url is not exist" });
+
+    /*--------------------get data from redis(cache) server----------------------*/
+    let cachedData = await redisClient.get(longUrl);
+    if (cachedData) {return res.status(200).send({status:true, data:JSON.parse(cachedData)})} // convert into JSON
 
     /*---------------------------Check Url is present in DB or not----------------------------------*/
     let longUrlFound = await urlModel.findOne({ longUrl: longUrl }).select({ urlCode: 1, longUrl: 1, shortUrl: 1, _id: 0 });
-    if (longUrlFound)
-      return res.status(200).send({ status: true, data: longUrlFound });
+    if (longUrlFound)return res.status(200).send({ status: true, data: longUrlFound });
 
     /*---------------------------Generate random short alpha-num characters----------------------------------*/
     const genShortUrl = shortId.generate().toLowerCase();
@@ -64,7 +52,12 @@ const createUrl = async function (req, res) {
       urlCode: createData.urlCode,
       longUrl: createData.longUrl,
       shortUrl: createData.shortUrl,
-    };
+    }
+
+    /*--------------------set data to redis(cache) server----------------------*/
+    await redisClient.set(longUrl, JSON.stringify(obj)); //convert into string
+    await redisClient.expire(longUrl,60); //set expire 60 seconds
+
     return res.status(201).send({ status: true, data: obj });
   } catch (err) {
     return res.status(500).send({ status: false, message: err.message });
@@ -74,17 +67,21 @@ const createUrl = async function (req, res) {
 const getUrl = async function (req, res) {
   try {
     let urlCode = req.params.urlCode;
-    // 3. Start using the redis commad
-    let cachedData = await GET_ASYNC(urlCode);
+
+    /*--------------------get data from redis(cache) server----------------------*/
+    let cachedData = await redisClient.get(urlCode);
     if (cachedData) {return res.status(302).redirect(cachedData)} 
 
-      /*---------------------------Check urlCode is present in DB or not----------------------------------*/
-      let foundUrl = await urlModel.findOne({ urlCode: urlCode });
+    /*---------------------------Check urlCode is present in DB or not----------------------------------*/
+    let foundUrl = await urlModel.findOne({ urlCode: urlCode });
 
-      if (!foundUrl)return res.status(404).send({ status: false, message: "short url is not exit in DB" });
+    if (!foundUrl)return res.status(404).send({ status: false, message: "short url is not exit in DB" });
 
-      await SET_ASYNC(urlCode, JSON.stringify(foundUrl.longUrl), "EX", 1000);
-      return res.status(302).redirect(foundUrl.longUrl);
+    /*--------------------set data to redis(cache) server----------------------*/
+    await redisClient.set(urlCode, foundUrl.longUrl);
+    await redisClient.expire(urlCode,60); //set expire 60 seconds
+
+    return res.status(302).redirect(foundUrl.longUrl);
     
   } catch (err) {
     return res.status(500).send({ status: false, message: err.message });
