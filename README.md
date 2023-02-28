@@ -1,8 +1,8 @@
 # project- URL Shortify
 
-Scalable URL Shortner Project Requirement
+Scalable URL Shortify Project Requirement
 
-Phase I
+# Phase I
 
 Overview
 URL shortening is used to create shorter aliases for long URLs. We call these shortened aliases “short links.” Users are redirected to the original URL when they hit these short links. Short links save a lot of space when displayed, printed, messaged, or tweeted. Additionally, users are less likely to mistype shorter URLs.
@@ -31,10 +31,19 @@ Follow the naming conventions exactly as instructed. The backend code will be in
 
 ## Url Model
 
-Url Model
-{ urlCode: { mandatory, unique, lowercase, trim }, 
-longUrl: {mandatory, valid url}, 
-shortUrl: {mandatory, unique} }
+```
+{ 
+  urlCode: { 
+    mandatory, unique, lowercase, trim 
+    }, 
+longUrl: {
+  mandatory, valid url
+  }, 
+shortUrl: {
+  mandatory, unique
+  } 
+}
+```
 
 ## POST /url/shorten
 Create a short URL for an original url recieved in the request body.
@@ -55,7 +64,7 @@ Each api should have a new request in this collection
 Each request in the collection should be rightly named. Eg Url shorten, Get Url etc
 Each member of each team should have their tests in running state
 
-Phase II
+# Phase II
 
 Use caching while fetching the shortened url to minimize db calls.
 Implement what makes sense to you and we will build understanding over the demo discussion.
@@ -71,6 +80,7 @@ Successful Response structure
 
   }
 }
+```
 
 Error Response structure
 
@@ -79,6 +89,7 @@ Error Response structure
   status: false,
   message: ""
 }
+```
 
 Response samples
 Url shorten response
@@ -91,3 +102,4 @@ Url shorten response
     "urlCode": "ghfgfg"
   } 
 }
+```
