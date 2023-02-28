@@ -1,7 +1,9 @@
-# project-4-self
+# project- URL Shortify
 
 Scalable URL Shortner Project Requirement
+
 Phase I
+
 Overview
 URL shortening is used to create shorter aliases for long URLs. We call these shortened aliases “short links.” Users are redirected to the original URL when they hit these short links. Short links save a lot of space when displayed, printed, messaged, or tweeted. Additionally, users are less likely to mistype shorter URLs.
 
@@ -24,7 +26,9 @@ Follow the naming conventions exactly as instructed. The backend code will be in
 Models
 
 Url Model
-{ urlCode: { mandatory, unique, lowercase, trim }, longUrl: {mandatory, valid url}, shortUrl: {mandatory, unique} }
+{ urlCode: { mandatory, unique, lowercase, trim }, 
+longUrl: {mandatory, valid url}, 
+shortUrl: {mandatory, unique} }
 
 POST /url/shorten
 Create a short URL for an original url recieved in the request body.
@@ -44,11 +48,14 @@ To test these apis create a new collection in Postman named Project 4 Url Shortn
 Each api should have a new request in this collection
 Each request in the collection should be rightly named. Eg Url shorten, Get Url etc
 Each member of each team should have their tests in running state
+
 Phase II
+
 Use caching while fetching the shortened url to minimize db calls.
 Implement what makes sense to you and we will build understanding over the demo discussion.
 Figure out if you can also use caching while redirecting to the original url from the shortedned url
 Response
+
 Successful Response structure
 {
   status: true,
@@ -56,11 +63,13 @@ Successful Response structure
 
   }
 }
+
 Error Response structure
 {
   status: false,
   message: ""
 }
+
 Response samples
 Url shorten response
 {
