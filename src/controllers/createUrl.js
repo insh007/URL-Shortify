@@ -6,7 +6,7 @@ const redis = require("redis");
 
 /*--------------------Connect to the redis server----------------------*/
 const redisClient = redis.createClient({
-    url : "redis://default:zvyCd8xYcj2rO6N4NCUrbkivoAZiX15K@redis-19717.c264.ap-south-1-1.ec2.cloud.redislabs.com:19717"
+  url : "redis://default:zvyCd8xYcj2rO6N4NCUrbkivoAZiX15K@redis-19717.c264.ap-south-1-1.ec2.cloud.redislabs.com:19717"
 });
 
 redisClient.connect(console.log("Connected to Redis..."))
@@ -55,10 +55,9 @@ const createUrl = async function (req, res) {
     }
 
     /*--------------------set data to redis(cache) server----------------------*/
-    await redisClient.set(longUrl, JSON.stringify(obj)); //convert into string
-    await redisClient.expire(longUrl,60); //set expire 60 seconds
-
+    await redisClient.setEx(longUrl,60,JSON.stringify(obj)); //convert into string & set expire 60 seconds
     return res.status(201).send({ status: true, data: obj });
+
   } catch (err) {
     return res.status(500).send({ status: false, message: err.message });
   }
@@ -89,3 +88,10 @@ const getUrl = async function (req, res) {
 };
 module.exports.createUrl = createUrl;
 module.exports.getUrl = getUrl;
+
+
+
+
+
+
+
