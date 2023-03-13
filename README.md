@@ -1,5 +1,11 @@
 # project- URL Shortify
 
+## Make sure to check Frontened Repository :
+https://github.com/insh007/URL-Shortify-Frontend
+
+## Deploy Link :
+https://url-shortify-app.onrender.com
+
 Scalable URL Shortify Project Requirement
 
 # Phase I
