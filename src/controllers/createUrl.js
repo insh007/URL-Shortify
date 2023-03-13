@@ -1,3 +1,4 @@
+require('dotenv').config()
 const urlModel = require("../models/urlModel");
 const shortId = require("shortid");
 const isUrl = require("is-valid-http-url");
@@ -6,10 +7,12 @@ const redis = require("redis");
 
 /*--------------------Connect to the redis server----------------------*/
 const redisClient = redis.createClient({
-  url : "redis://default:zvyCd8xYcj2rO6N4NCUrbkivoAZiX15K@redis-19717.c264.ap-south-1-1.ec2.cloud.redislabs.com:19717"
+  url : process.env.REDIS_STRING
 });
 
 redisClient.connect(console.log("Connected to Redis..."))
+
+// let host_backend =  "https://short-api.onrender.com"
 
 const createUrl = async function (req, res) {
   try {
@@ -24,10 +27,10 @@ const createUrl = async function (req, res) {
       return res.status(400).send({ status: false, message: "provided longUrl is invalid" });
 
     /*---------------------------Check Url existence----------------------------------*/
-    let checkUrlExistence = await axios.get(longUrl)
-    .then(() => longUrl)
-    .catch(() => null);
-    if (!checkUrlExistence)return res.status(404).send({ status: false, message: "currently this url is not exist" });
+    // let checkUrlExistence = await axios.get(longUrl)
+    // .then(() => longUrl)
+    // .catch(() => null);
+    // if (!checkUrlExistence)return res.status(404).send({ status: false, message: "currently this url is not exist" });
 
     /*--------------------get data from redis(cache) server----------------------*/
     let cachedData = await redisClient.get(longUrl);
@@ -42,7 +45,7 @@ const createUrl = async function (req, res) {
 
     /*-------------------------Assigning data to req body------------------------------------*/
     req.body.urlCode = genShortUrl;
-    req.body.shortUrl = `http://localhost:3000/${genShortUrl}`;
+    req.body.shortUrl = `http://localhost:5000/${genShortUrl}`;
 
     /*---------------------------Creating data----------------------------------*/
     let createData = await urlModel.create(req.body);

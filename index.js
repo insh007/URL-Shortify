@@ -1,11 +1,17 @@
+require('dotenv').config()
 const express = require('express')
 const mongoose = require('mongoose')
 const route = require('./src/routes/route')
+const cors = require('cors')
 
 const app = express()
 app.use(express.json())
 
-mongoose.connect("mongodb+srv://insh007:Inshad123@firstcluster.p0r04o1.mongodb.net/project5-Self",{
+app.use(cors({
+    origin: ["http://localhost:3000", "https://url-shortify-app.onrender.com"] 
+}))
+
+mongoose.connect(process.env.MONGODB_STRING,{
     useNewUrlParser : true
 },mongoose.set('strictQuery', false))
 .then(()=>console.log("MongoDB is connected"))
@@ -13,6 +19,10 @@ mongoose.connect("mongodb+srv://insh007:Inshad123@firstcluster.p0r04o1.mongodb.n
 
 app.use('/',route)
 
-app.listen(3000, function(){
-    console.log("Express app is running on port:",3000)
+app.use("/*", function(req,res){
+    res.status(400).send("Provided url is wrong")
+})
+
+app.listen(process.env.PORT, function(){
+    console.log("Express app is running on port:",process.env.PORT)
 })
