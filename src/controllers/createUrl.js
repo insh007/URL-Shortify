@@ -12,7 +12,6 @@ const redisClient = redis.createClient({
 
 redisClient.connect(console.log("Connected to Redis..."))
 
-// let host_backend =  "https://short-api.onrender.com"
 
 const createUrl = async function (req, res) {
   try {
@@ -45,7 +44,7 @@ const createUrl = async function (req, res) {
 
     /*-------------------------Assigning data to req body------------------------------------*/
     req.body.urlCode = genShortUrl;
-    req.body.shortUrl = `http://localhost:5000/${genShortUrl}`;
+    req.body.shortUrl = `https://short-api-51t8.onrender.com/${genShortUrl}`;
 
     /*---------------------------Creating data----------------------------------*/
     let createData = await urlModel.create(req.body);
