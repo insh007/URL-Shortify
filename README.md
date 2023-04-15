@@ -1,6 +1,6 @@
 # project- URL Shortify
 
-## Make sure to check Frontened Repository :
+## Make sure to check Frontend Repository :
 https://github.com/insh007/URL-Shortify-Frontend
 
 ## Deploy Link :
